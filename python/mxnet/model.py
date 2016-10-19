@@ -282,6 +282,7 @@ def _train_multi_device(symbol, ctx, arg_names, param_names, aux_names,
 
         toc = time.time()
         logger.info('Epoch[%d] Time cost=%.3f', epoch, (toc - tic))
+        logger.info('{{"epoch": {}, "time": {}}}'.format(epoch, (toc - tic)))
 
         if epoch_end_callback or epoch + 1 == end_epoch:
             executor_manager.copy_to(arg_params, aux_params)

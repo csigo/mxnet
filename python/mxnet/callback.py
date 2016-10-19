@@ -97,12 +97,16 @@ class Speedometer(object):
         How many batches between calculations.
         Defaults to calculating & logging every 50 batches.
     """
-    def __init__(self, batch_size, frequent=50):
+    def __init__(self, batch_size, frequent=50, json_output=False, tag='train'):
         self.batch_size = batch_size
         self.frequent = frequent
         self.init = False
         self.tic = 0
         self.last_count = 0
+        self.tag = tag
+        self.output_format = 'Epoch[%d] Batch [%d]\tSpeed: %.2f samples/sec\t%s-%s=%f'
+        if json_output:
+            self.output_format = """{{"epoch": {}, "batch": {}, "speed": {}, "{}": {}, "tag": "{}"}}"""
 
     def __call__(self, param):
         """Callback to Show speed."""
@@ -118,8 +122,7 @@ class Speedometer(object):
                     name_value = param.eval_metric.get_name_value()
                     param.eval_metric.reset()
                     for name, value in name_value:
-                        logging.info('Epoch[%d] Batch [%d]\tSpeed: %.2f samples/sec\tTrain-%s=%f',
-                                     param.epoch, count, speed, name, value)
+                        logging.info(self.output_format.format(param.epoch, count, speed, name, value, self.tag))
                 else:
                     logging.info("Iter[%d] Batch [%d]\tSpeed: %.2f samples/sec",
                                  param.epoch, count, speed)
